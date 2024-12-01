@@ -12,7 +12,7 @@ const Carousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); // Rotate every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, [images.length]);
@@ -23,13 +23,13 @@ const Carousel = () => {
         className="flex transition-transform duration-700 ease-in-out"
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
-          width: `${images.length * 100}%`, // Ensures proper width for all images
+          width: `${images.length * 100}%`,
         }}
       >
         {images.map((src, index) => (
           <div
             key={index}
-            className="w-full h-[70vh] flex-shrink-0" // Ensures each slide takes full width
+            className="w-full h-[70vh] flex-shrink-0"
           >
             <img
               src={src}
