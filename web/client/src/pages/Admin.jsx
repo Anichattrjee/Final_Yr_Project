@@ -23,53 +23,96 @@ const AdminDashboard = () => {
     setNewCandidate("");
   };
 
+  const handleRemoveCandidate = (index) => {
+    const updatedCandidates = candidates.filter((_, i) => i !== index);
+    setCandidates(updatedCandidates);
+    localStorage.setItem("candidates", JSON.stringify(updatedCandidates));
+  };
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 text-gray-700">
+      <div className="container mx-auto p-8">
+        {/* Header */}
+        <header className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-blue-600">
+            Admin Dashboard
+          </h1>
+          <p className="text-lg mt-2">
+            Manage elections and candidates seamlessly.
+          </p>
+        </header>
 
-      {/* Election Date & Time */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Set Election Date & Time</h2>
-        <input
-          type="datetime-local"
-          value={electionDateTime}
-          onChange={handleDateChange}
-          className="p-2 border rounded"
-        />
-      </div>
-
-      {/* Add Candidates */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Add Candidates</h2>
-        <div className="flex items-center gap-2">
+        {/* Election Date & Time */}
+        <section className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
+            Set Election Date & Time
+          </h2>
           <input
-            type="text"
-            placeholder="Enter candidate name"
-            value={newCandidate}
-            onChange={(e) => setNewCandidate(e.target.value)}
-            className="p-2 border rounded flex-1"
+            type="datetime-local"
+            value={electionDateTime}
+            onChange={handleDateChange}
+            className="p-3 border rounded-lg w-full focus:ring focus:ring-blue-300"
           />
-          <button
-            onClick={handleAddCandidate}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-          >
-            Add
-          </button>
-        </div>
-      </div>
+          {electionDateTime && (
+            <p className="mt-3 text-gray-500">
+              Current Election Date & Time:{" "}
+              <span className="font-medium text-gray-800">
+                {new Date(electionDateTime).toLocaleString()}
+              </span>
+            </p>
+          )}
+        </section>
 
-      {/* Current Candidates */}
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Current Candidates</h2>
-        {candidates.length > 0 ? (
-          <ul className="list-disc pl-6">
-            {candidates.map((candidate, index) => (
-              <li key={index}>{candidate}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No candidates added yet.</p>
-        )}
+        {/* Add Candidates */}
+        <section className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
+            Add Candidates
+          </h2>
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              placeholder="Enter candidate name"
+              value={newCandidate}
+              onChange={(e) => setNewCandidate(e.target.value)}
+              className="p-3 border rounded-lg flex-grow focus:ring focus:ring-blue-300"
+            />
+            <button
+              onClick={handleAddCandidate}
+              className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg shadow hover:bg-blue-600"
+            >
+              Add
+            </button>
+          </div>
+        </section>
+
+        {/* Current Candidates */}
+        <section className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
+            Current Candidates
+          </h2>
+          {candidates.length > 0 ? (
+            <ul className="space-y-2">
+              {candidates.map((candidate, index) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border"
+                >
+                  <span className="font-medium text-gray-800">
+                    {candidate}
+                  </span>
+                  <button
+                    onClick={() => handleRemoveCandidate(index)}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">No candidates added yet.</p>
+          )}
+        </section>
       </div>
     </div>
   );

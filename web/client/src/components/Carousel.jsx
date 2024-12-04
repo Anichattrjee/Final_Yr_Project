@@ -12,7 +12,7 @@ const Carousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); 
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [images.length]);
@@ -29,14 +29,9 @@ const Carousel = () => {
         {images.map((src, index) => (
           <div
             key={index}
-            className="w-full h-[70vh] flex-shrink-0"
-          >
-            <img
-              src={src}
-              alt={`Slide ${index + 1}`}
-              className="w-full h-full object-scale-down"
-            />
-          </div>
+            className="w-full h-[70vh] flex-shrink-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${src})` }}
+          ></div>
         ))}
       </div>
     </div>
