@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  velocity_x: ^4.2.1
 get:
   eva_icons_flutter: ^3.1.0
   velocity_x: ^4.2.1
