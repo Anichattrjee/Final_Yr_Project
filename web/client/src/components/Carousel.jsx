@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const Carousel = () => {
   const images = [
-    "../../image1.jpg",
-    "../../image2.jpg",
-    "https://via.placeholder.com/800x300?text=Vote+For+A+Better+Tomorrow",
+    "../../img3.jpg",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -12,7 +10,7 @@ const Carousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); 
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [images.length]);
@@ -29,14 +27,9 @@ const Carousel = () => {
         {images.map((src, index) => (
           <div
             key={index}
-            className="w-full h-[70vh] flex-shrink-0"
-          >
-            <img
-              src={src}
-              alt={`Slide ${index + 1}`}
-              className="w-full h-full object-scale-down"
-            />
-          </div>
+            className="w-full h-[70vh] flex-shrink-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${src})` }}
+          ></div>
         ))}
       </div>
     </div>

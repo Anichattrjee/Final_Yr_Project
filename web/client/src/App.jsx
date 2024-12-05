@@ -4,6 +4,9 @@ import Home from "./Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
+import CastVotePage from "./pages/CastVote";
+import CurrentStatusPage from "./pages/CurrentStatus";
+import Result from "./pages/Result";
 
 const App = () => {
   return (
@@ -12,6 +15,9 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/cast-vote" element={<CastVotePage isLoggedIn={true} />} />
+        <Route path="/current-status" element={<CurrentStatusPage />} />
+        <Route path="/results" element = {<Result/>}/>
       </Routes>
   );
 };
