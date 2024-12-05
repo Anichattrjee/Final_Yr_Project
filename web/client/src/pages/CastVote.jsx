@@ -32,20 +32,20 @@ const CastVotePage = ({ isLoggedIn, userName }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-50 to-indigo-100 text-gray-800">
-      <header className="bg-white shadow-md p-6">
-        <h1 className="text-3xl font-bold text-indigo-600">Cast Your Vote</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-lightBlue-100 text-gray-800">
+      <header className="bg-blue-500 text-white p-6 shadow-md">
+        <h1 className="text-3xl font-bold">Cast Your Vote</h1>
         {isLoggedIn ? (
-          <p className="mt-2 text-gray-500">Welcome, {userName}!</p>
+          <p className="mt-2">Welcome, {userName}!</p>
         ) : (
-          <p className="mt-2 text-red-500">You must log in to cast your vote.</p>
+          <p className="mt-2 text-yellow-200">You must log in to cast your vote.</p>
         )}
       </header>
 
       <main className="container mx-auto p-8">
         {/* Election Info */}
         <section className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-indigo-600 mb-4">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
             Election Information
           </h2>
           <p className="text-gray-700">
@@ -63,8 +63,8 @@ const CastVotePage = ({ isLoggedIn, userName }) => {
         </section>
 
         {/* Candidates List */}
-        <section className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-indigo-600 mb-4">
+        <section className="bg-blue-50 rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
             Candidates
           </h2>
           {candidates.length > 0 ? (
@@ -74,8 +74,8 @@ const CastVotePage = ({ isLoggedIn, userName }) => {
                   key={index}
                   className={`p-4 rounded-lg border ${
                     votedCandidate === candidate
-                      ? "bg-green-100 border-green-500"
-                      : "bg-indigo-50 border-indigo-300"
+                      ? "bg-lightBlue-200 border-blue-500"
+                      : "bg-white border-blue-300"
                   }`}
                 >
                   <p className="text-lg font-medium text-gray-800">
@@ -87,7 +87,7 @@ const CastVotePage = ({ isLoggedIn, userName }) => {
                     className={`mt-4 px-4 py-2 font-medium text-white rounded ${
                       votedCandidate
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-indigo-500 hover:bg-indigo-700"
+                        : "bg-blue-500 hover:bg-blue-700"
                     }`}
                   >
                     {votedCandidate ? "Vote Casted" : "Vote"}
@@ -110,7 +110,7 @@ const CastVotePage = ({ isLoggedIn, userName }) => {
             </h3>
             <p className="mt-4 text-gray-600">
               Are you sure you want to vote for{" "}
-              <strong className="text-indigo-600">{selectedCandidate}</strong>?
+              <strong className="text-blue-600">{selectedCandidate}</strong>?
             </p>
             <div className="mt-6 flex justify-end gap-4">
               <button
@@ -121,7 +121,7 @@ const CastVotePage = ({ isLoggedIn, userName }) => {
               </button>
               <button
                 onClick={confirmVote}
-                className="px-4 py-2 text-white bg-indigo-500 rounded hover:bg-indigo-700"
+                className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700"
               >
                 Confirm
               </button>

@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const Carousel = () => {
   const images = [
-    "../../image1.jpg",
-    "../../image2.jpg",
-    "https://via.placeholder.com/800x300?text=Vote+For+A+Better+Tomorrow",
+    "../../img3.jpg",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);

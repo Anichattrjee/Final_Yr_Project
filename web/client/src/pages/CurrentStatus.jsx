@@ -34,10 +34,10 @@ const CurrentStatusPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-teal-50 to-teal-100 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 text-gray-800">
       <header className="bg-white shadow-md p-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-teal-600">Current Election Status</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Current Election Status</h1>
           <p className="text-gray-600 mt-2">
             Stay updated with the latest election details.
           </p>
@@ -50,7 +50,7 @@ const CurrentStatusPage = () => {
       <main className="container mx-auto p-8">
         {/* Election Info */}
         <section className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-teal-600 mb-4">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
             Election Information
           </h2>
           <p className="text-gray-700">
@@ -68,7 +68,7 @@ const CurrentStatusPage = () => {
 
         {/* Candidates and Votes */}
         <section className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-teal-600 mb-4">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
             Candidates & Votes
           </h2>
           {candidates.length > 0 ? (
@@ -76,7 +76,7 @@ const CurrentStatusPage = () => {
               {candidates.map((candidate, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg bg-teal-50 border border-teal-300 shadow-md flex flex-col items-start"
+                  className="p-4 rounded-lg bg-blue-50 border border-blue-300 shadow-md flex flex-col items-start"
                 >
                   <h3 className="text-lg font-medium text-gray-800">{candidate}</h3>
                   <div className="mt-4 flex items-center">

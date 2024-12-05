@@ -40,9 +40,9 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-green-50 to-green-100 flex items-center justify-center">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-green-600 mb-6">
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 flex items-center justify-center">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md border border-blue-200">
+        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Register
         </h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -68,20 +68,20 @@ const Register = () => {
                 placeholder={placeholder}
                 value={formData[field]}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-lg focus:ring focus:ring-green-300 focus:outline-none"
+                className="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
               />
             </div>
           ))}
           <button
             type="submit"
-            className="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 focus:ring focus:ring-green-300"
+            className="w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 focus:ring focus:ring-blue-300"
           >
             Register
           </button>
         </form>
         <p className="text-center text-gray-500 mt-4">
           Already have an account?{" "}
-          <a href="/login" className="text-green-600 hover:underline">
+          <a href="/login" className="text-blue-600 hover:underline">
             Login
           </a>
         </p>
