@@ -62,7 +62,8 @@ const ElectionDetailPage = () => {
       }));
       setHasVoted(true);
     } catch (error) {
-      alert(error.response?.data?.message || "Voting failed");
+      alert(error.response?.data?.message || 
+        "Voting failed");
     }
   };
 
