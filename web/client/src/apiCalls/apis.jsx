@@ -105,3 +105,7 @@ export const getPendingCandidates = async () => {
     const res = await api.get(`/api/elections/${electionId}`);
     return res.data.candidates;
   };
+  export const getCandidateElections = async (candidateId) => {
+    const res = await api.get(`/api/elections/${candidateId}/elections`);
+    return res.data;
+  };

@@ -42,7 +42,8 @@ const electionSchema = new mongoose.Schema({
   }],
   voters: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    default: []
   }],
   status: {
     type: String,

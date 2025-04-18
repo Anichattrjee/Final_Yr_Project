@@ -34,6 +34,17 @@ const Navbar = () => {
                   {user.username}
                 </NavLink>
               </div>
+              
+              {/* Candidate-specific link */}
+              {user.role === 'candidate' && (
+                <NavLink 
+                  to="/candidate-profile"
+                  className="text-lg font-semibold hover:text-blue-200 transition-colors duration-200"
+                >
+                  My Campaign
+                </NavLink>
+              )}
+
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-2 text-lg font-semibold px-4 py-2 rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300 ease-in-out"

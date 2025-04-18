@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAllElections } from "../apiCalls/apis"; // Adjust import path
 import { Link } from "react-router-dom";
 
-const ElectionListingPage = ({ isLoggedIn, userConstituency }) => {
+const ElectionListingPage = ({ isLoggedIn}) => {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -96,9 +96,7 @@ const ElectionListingPage = ({ isLoggedIn, userConstituency }) => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filterElections().map(election => {
             const status = getElectionStatus(election.startDate, election.endDate);
-            const canVote = status === 'active' && 
-                             isLoggedIn && 
-                             election.constituency === userConstituency;
+            const canVote = status === 'active' && isLoggedIn;
 
             return (
               <div key={election._id} className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -129,24 +127,29 @@ const ElectionListingPage = ({ isLoggedIn, userConstituency }) => {
                     </span>
 
                     {status === 'completed' ? (
-                      <Link 
-                        to={`/elections/${election._id}/results`}
-                        className="text-blue-600 hover:underline"
-                      >
-                        View Results
-                      </Link>
-                    ) : (
-                      <Link 
-                        to={`/elections/${election._id}`}
-                        className={`px-4 py-2 rounded ${
-                          canVote 
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                        }`}
-                      >
-                        {status === 'upcoming' ? 'View Details' : 'Vote Now'}
-                      </Link>
-                    )}
+  <Link 
+    to={`/elections/${election._id}/results`}
+    className="text-blue-600 hover:underline"
+  >
+    View Results
+  </Link>
+) : (
+  <Link 
+    to={`/elections/${election._id}`}
+    className={`px-4 py-2 rounded ${
+      canVote 
+        ? 'bg-blue-600 text-white hover:bg-blue-700'
+        : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+    }`}
+    onClick={(e) => {
+      if ( !canVote) {
+        e.preventDefault();
+      }
+    }}
+  >
+    {status === 'upcoming' ? 'View Details' : 'Vote Now'}
+  </Link>
+)}
                   </div>
                 </div>
               </div>
