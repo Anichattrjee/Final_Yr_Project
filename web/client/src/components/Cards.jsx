@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Cards = () => {
   const features = [
     {
-      title: "Cast Vote",
+      title: "Elections List",
       description: "Submit your vote securely online.",
       icon: "🗳️",
     },
@@ -23,8 +23,8 @@ const Cards = () => {
   const navigate = useNavigate();
 
   const handleClick = (feature) => {
-    if (feature === "Cast Vote") {
-      navigate("/cast-vote");
+    if (feature === "Elections List") {
+      navigate("/elections");
     } else if (feature === "Current Status") {
       navigate("/current-status");
     } else {
