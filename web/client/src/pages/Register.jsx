@@ -65,13 +65,13 @@ const Register = () => {
           {/* Username */}
           <div>
             <label htmlFor="username" className="block text-gray-700 font-medium mb-1">
-              Username
+              Name
             </label>
             <input
               id="username"
               name="username"
               type="text"
-              placeholder="Enter your username"
+              placeholder="Enter your name"
               value={formData.username}
               onChange={handleChange}
               required
@@ -116,13 +116,13 @@ const Register = () => {
           {/* Voter ID */}
           <div>
             <label htmlFor="voterID" className="block text-gray-700 font-medium mb-1">
-              Voter ID
+              UID
             </label>
             <input
               id="voterID"
               name="voterID"
               type="text"
-              placeholder="Enter your Voter ID"
+              placeholder="Enter your UID"
               value={formData.voterID}
               onChange={handleChange}
               required
