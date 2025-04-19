@@ -12,7 +12,7 @@ dependencies:
   
 
   cupertino_icons: ^1.0.8
-  velocity_x: ^4.2.1
+  # velocity_x: ^4.2.1
   get:
   eva_icons_flutter: ^3.1.0
   get_storage: ^2.0.3
@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: 
   fluttertoast: ^8.2.6
   http: ^1.2.2
+  intl: ^0.20.2
 
   
 dev_dependencies:

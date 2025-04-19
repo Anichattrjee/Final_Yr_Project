@@ -1,11 +1,10 @@
-import 'package:app/pages/navigation_wrapper.dart';
-import 'package:app/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import '../controllers/auth_controller.dart';
 import '../utils/AppColors.dart';
+import 'navigation_wrapper.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -13,6 +12,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint("login page");
+
     final AuthController authController = Get.put(AuthController());
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
@@ -35,7 +35,9 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  100.heightBox,
+                  SizedBox(
+                    height: 100,
+                  ),
                   Text(
                     'Welcome Back!',
                     style: TextStyle(
@@ -44,7 +46,7 @@ class LoginPage extends StatelessWidget {
                       color: AppColors.primaryBlue,
                     ),
                   ),
-                  100.heightBox,
+                  SizedBox(height: 100),
                   Text(
                     'Please log in to continue',
                     style: TextStyle(
@@ -104,7 +106,9 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  45.heightBox,
+                  SizedBox(
+                    height: 45,
+                  ),
 
                   // Login Button
                   SizedBox(

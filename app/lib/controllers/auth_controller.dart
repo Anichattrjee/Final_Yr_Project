@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app/database/local_storage.dart';
+import 'package:app/utils/AppColors.dart';
 import 'package:app/utils/AppConstant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,14 +44,16 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      Get.snackbar("Login Failed", errorMessage.value);
+      Get.snackbar("Login Failed", errorMessage.value,
+          backgroundColor: AppColors.white);
     } finally {
       isLoading.value = false;
     }
     return false;
   }
 
-  Future<void> register(Map<String, dynamic> formData) async {
+  Future<bool> register(String email, String uid, String role, String name,
+      String password) async {
     debugPrint("inside register");
     debugPrint(baseUrl);
     isLoading.value = true;
@@ -58,18 +61,29 @@ class AuthController extends GetxController {
       final response = await http.post(
         Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(formData),
+        body: jsonEncode({
+          'email': email,
+          'voterID': uid,
+          'username': name,
+          'role': role,
+          'password': password
+        }),
       );
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        Get.snackbar("Registration Success", data['message']);
+        Get.snackbar("Registration Success", data['message'],
+            backgroundColor: AppColors.white);
+        return true;
       } else {
         throw Exception(data['message']);
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      Get.snackbar("Registration Failed", errorMessage.value);
+      debugPrint(e.toString());
+      Get.snackbar("Registration Failed", errorMessage.value,
+          backgroundColor: AppColors.white);
+      return false;
     } finally {
       isLoading.value = false;
     }

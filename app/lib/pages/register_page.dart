@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import '../controllers/auth_controller.dart';
 import '../utils/AppColors.dart';
+import '../widgets/bottom_sheet.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -15,19 +15,14 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
 
   final RxString selectedRole = 'voter'.obs;
+  void clearController() {
+    uidController.clear();
+    nameController.clear();
+    emailController.clear();
+    passwordController.clear();
+  }
 
   RegisterPage({super.key});
-
-  void _submitForm() {
-    final formData = {
-      "uid": uidController.text.trim(),
-      "name": nameController.text.trim(),
-      "email": emailController.text.trim(),
-      "password": passwordController.text.trim(),
-      "role": selectedRole.value,
-    };
-    authController.register(formData);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +43,7 @@ class RegisterPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            30.heightBox,
+            const SizedBox(height: 30),
             Text(
               'Create Account',
               style: TextStyle(
@@ -57,12 +52,12 @@ class RegisterPage extends StatelessWidget {
                 color: AppColors.primaryBlue,
               ),
             ),
-            20.heightBox,
+            const SizedBox(height: 20),
             Text(
               'Register to continue securely',
               style: TextStyle(fontSize: 16, color: AppColors.grey),
             ),
-            40.heightBox,
+            const SizedBox(height: 40),
 
             // UID
             TextField(
@@ -79,7 +74,7 @@ class RegisterPage extends StatelessWidget {
                 ),
               ),
             ),
-            16.heightBox,
+            const SizedBox(height: 16),
 
             // Name
             TextField(
@@ -96,9 +91,9 @@ class RegisterPage extends StatelessWidget {
                 ),
               ),
             ),
-            16.heightBox,
+            const SizedBox(height: 16),
 
-            // Phone
+            // Email
             TextField(
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
@@ -114,7 +109,7 @@ class RegisterPage extends StatelessWidget {
                 ),
               ),
             ),
-            16.heightBox,
+            const SizedBox(height: 16),
 
             // Password
             TextField(
@@ -132,7 +127,7 @@ class RegisterPage extends StatelessWidget {
                 ),
               ),
             ),
-            16.heightBox,
+            const SizedBox(height: 16),
 
             // Role Dropdown
             Obx(() => DropdownButtonFormField<String>(
@@ -157,7 +152,7 @@ class RegisterPage extends StatelessWidget {
                     ),
                   ),
                 )),
-            5.heightBox,
+            const SizedBox(height: 5),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -168,13 +163,36 @@ class RegisterPage extends StatelessWidget {
                 ),
               ),
             ),
-            45.heightBox,
+            const SizedBox(height: 45),
 
             // Register Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _submitForm,
+                onPressed: () {
+                  authController
+                      .register(emailController.text, uidController.text,
+                          'voter', nameController.text, passwordController.text)
+                      .then((value) {
+                    if (value) {
+                      showModalBottomSheet(
+                        context: context, // use local context from build method
+                        isDismissible: false,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (ctx) => registrationBottomSheetContent(ctx),
+                      );
+
+                      Future.delayed(Duration(seconds: 3), () {
+                        Navigator.of(context).pop(); // pop the bottom sheet
+                        Get.off(() => const LoginPage());
+                      });
+                    }
+                  });
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryBlue,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -182,13 +200,15 @@ class RegisterPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Register',
-                  style: TextStyle(fontSize: 18, color: AppColors.white),
-                ),
+                child: authController.isLoading.value
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Register',
+                        style: TextStyle(fontSize: 18, color: AppColors.white),
+                      ),
               ),
             ),
-            16.heightBox,
+            const SizedBox(height: 16),
 
             // Redirect to Login
             Row(
