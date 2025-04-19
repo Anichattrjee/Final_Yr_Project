@@ -1,0 +1,57 @@
+<!-- templates/vote.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cast Your Vote</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 {
+            color: #34495e;
+        }
+        form {
+            background: white;
+            display: inline-block;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="radio"] {
+            margin: 10px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ name }}</h1>
+    <form action="/vote" method="POST">
+        <input type="hidden" name="voter" value="{{ name }}">
+        <label>Select Party:</label><br><br>
+        <input type="radio" name="party" value="Party A" required> Party A<br>
+        <input type="radio" name="party" value="Party B"> Party B<br>
+        <input type="radio" name="party" value="Party C"> Party C<br>
+        <input type="radio" name="party" value="NOTA"> NOTA<br><br>
+        <button type="submit">Cast Vote</button>
+    </form>
+</body>
+</html>
