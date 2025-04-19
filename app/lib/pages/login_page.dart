@@ -1,6 +1,10 @@
+import 'package:app/pages/navigation_wrapper.dart';
+import 'package:app/pages/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../controllers/auth_controller.dart';
 import '../utils/AppColors.dart';
 
 class LoginPage extends StatelessWidget {
@@ -8,6 +12,11 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("login page");
+    final AuthController authController = Get.put(AuthController());
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -20,151 +29,156 @@ class LoginPage extends StatelessWidget {
         centerTitle: true,
         elevation: 5,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Title
-              100.heightBox,
-              Text(
-                'Welcome Back!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlue,
-                ),
-              ),
-              100.heightBox,
-              Text(
-                'Please log in to continue',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.grey,
-                ),
-              ),
-              const SizedBox(height: 32),
+      body: Obx(() => SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  100.heightBox,
+                  Text(
+                    'Welcome Back!',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlue,
+                    ),
+                  ),
+                  100.heightBox,
+                  Text(
+                    'Please log in to continue',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
 
-              // UID Field
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Enter your UID',
-                  labelStyle: TextStyle(color: AppColors.primaryBlue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primaryBlue),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: Icon(Icons.person, color: AppColors.primaryBlue),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Password Field
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Enter your Password',
-                  labelStyle: TextStyle(color: AppColors.primaryBlue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primaryBlue),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: Icon(Icons.lock, color: AppColors.primaryBlue),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Instructions
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Note: Use your registered UID and password for secure login. You will be directed to biometric authentication further.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.grey,
-                  ),
-                ),
-              ),
-              45.heightBox,
-              // Login Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle login action
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                            'Login functionality is not implemented yet.'),
-                        backgroundColor: AppColors.primaryBlue,
+                  // Email Field
+                  TextField(
+                    keyboardType: TextInputType.emailAddress,
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter your email',
+                      labelStyle: TextStyle(color: AppColors.primaryBlue),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.primaryBlue),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon:
+                          Icon(Icons.mail, color: AppColors.primaryBlue),
                     ),
                   ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 18, color: AppColors.white),
-                  ),
-                ),
-              ),
+                  const SizedBox(height: 16),
 
-              const SizedBox(height: 16),
-
-              // Forgot Password & Register
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Forgot your password?',
-                    style: TextStyle(color: AppColors.grey),
+                  // Password Field
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Enter your Password',
+                      labelStyle: TextStyle(color: AppColors.primaryBlue),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.primaryBlue),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon:
+                          Icon(Icons.lock, color: AppColors.primaryBlue),
+                    ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      // Handle forgot password
-                    },
+                  const SizedBox(height: 16),
+
+                  Align(
+                    alignment: Alignment.centerLeft,
                     child: Text(
-                      'Reset Here',
-                      style: TextStyle(color: AppColors.primaryBlue),
+                      'Note: Use your registered email and password for secure login.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.grey,
+                      ),
                     ),
+                  ),
+                  45.heightBox,
+
+                  // Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: authController.isLoading.value
+                          ? null
+                          : () {
+                              final email = emailController.text.trim();
+                              final password = passwordController.text.trim();
+                              if (email.isEmpty || password.isEmpty) {
+                                Get.snackbar("Error",
+                                    "Please enter both email and password",
+                                    backgroundColor: Colors.redAccent,
+                                    colorText: Colors.white);
+                              } else {
+                                authController
+                                    .login(email, password)
+                                    .then((value) {
+                                  if (value)
+                                    Get.offAll(() => NavigationWrapper());
+                                });
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryBlue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: authController.isLoading.value
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 18, color: AppColors.white),
+                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Forgot your password?',
+                          style: TextStyle(color: AppColors.grey)),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text('Reset Here',
+                            style: TextStyle(color: AppColors.primaryBlue)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('New user?',
+                          style: TextStyle(color: AppColors.grey)),
+                      TextButton(
+                        onPressed: () {
+                          Get.off(() => RegisterPage());
+                        },
+                        child: Text('Register Now',
+                            style: TextStyle(color: AppColors.primaryBlue)),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'New user?',
-                    style: TextStyle(color: AppColors.grey),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // Handle registration
-                    },
-                    child: Text(
-                      'Register Now',
-                      style: TextStyle(color: AppColors.primaryBlue),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 }

@@ -1,4 +1,7 @@
+import 'package:app/database/local_storage.dart';
+import 'package:app/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../utils/AppColors.dart';
@@ -131,10 +134,12 @@ class PersonalDetailsPage extends StatelessWidget {
               50.heightBox,
 
               // Back Button
-              Center(
+              SizedBox(
+                width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
+                  onPressed: () async {
+                    await LocalStorage.clearUserDetails();
+                    Get.offAll(() => LoginPage());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryBlue,
@@ -145,7 +150,7 @@ class PersonalDetailsPage extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Go Back',
+                    'Log Out',
                     style: TextStyle(fontSize: 16, color: AppColors.white),
                   ),
                 ),

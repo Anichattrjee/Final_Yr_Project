@@ -19,6 +19,7 @@ dependencies:
 
   shared_preferences: 
   fluttertoast: ^8.2.6
+  http: ^1.2.2
 
   
 dev_dependencies:
