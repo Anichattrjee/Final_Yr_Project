@@ -107,7 +107,16 @@ router.post('/:id/vote', auth, async (req, res) => {
       election.voters = [];
     }
 
-    // Convert to Date objects for comparison
+    const getElectionStatus = (startDate, endDate) => {
+      const now = new Date();
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      if (now < start) return 'upcoming';
+      if (now > end) return 'completed';
+      return 'active';
+    };
+    election.status = getElectionStatus(election.startDate, election.endDate);
     const now = new Date();
     const startDate = new Date(election.startDate);
     const endDate = new Date(election.endDate);
@@ -299,6 +308,28 @@ router.get('/:id/elections', auth, async (req, res) => {
     }).select('title startDate endDate status results');
     
     res.json(elections);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.patch('/:id/start', auth, adminOnly, async (req, res) => {
+  try {
+    const election = await Election.findByIdAndUpdate(
+      req.params.id,
+      { status: 'active' },
+      { new: true }
+    );
+    res.json(election);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.delete('/:id', auth, adminOnly, async (req, res) => {
+  try {
+    await Election.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Election deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

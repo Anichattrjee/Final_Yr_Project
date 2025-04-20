@@ -25,6 +25,7 @@ const App = () => {
         <Route path="/profile" element={<VoterProfilePage/>} />
         <Route path="/candidate-profile" element={<CandidateProfilePage />} />
         <Route path="/elections/:id" element={<ElectionDetailPage />} />
+        <Route path="current-status" element={<CurrentStatusPage />} />
         
       </Routes>
   );

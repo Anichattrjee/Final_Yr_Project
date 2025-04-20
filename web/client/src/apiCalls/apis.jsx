@@ -94,9 +94,17 @@ export const getPendingCandidates = async () => {
     const res = await api.post(`/api/elections/${electionId}/end`);
     return res.data;
   };
-  
+  export const startElection = async (electionId) => {
+    const res = await api.patch(`/api/elections/${electionId}/start`);
+    return res.data;
+  };
   export const getElectionResults = async (electionId) => {
     const res = await api.get(`/api/elections/${electionId}/results`);
+    return res.data;
+  };
+
+  export const deleteElection = async (electionId) => {
+    const res = await api.delete(`/api/elections/${electionId}`);
     return res.data;
   };
   
