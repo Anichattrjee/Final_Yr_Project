@@ -1,0 +1,52 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f5f7fa;
+            padding: 50px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        form {
+            margin: 20px auto;
+            display: inline-block;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Face Recognition Based Voting</h1>
+
+    <form method="POST" action="/detect">
+        <button type="submit">Identify Me</button>
+    </form>
+
+    {% if user %}
+        <h2>Welcome {{ user }}!</h2>
+        <form method="POST" action="/vote">
+            <button type="submit" name="party" value="BJP">Vote BJP</button>
+            <button type="submit" name="party" value="CONGRESS">Vote Congress</button>
+            <button type="submit" name="party" value="AAP">Vote AAP</button>
+            <button type="submit" name="party" value="NOTA">Vote NOTA</button>
+        </form>
+    {% endif %}
+</body>
+</html>

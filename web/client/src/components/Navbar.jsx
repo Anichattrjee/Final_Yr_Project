@@ -18,7 +18,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo Section */}
         <h1 className="text-3xl font-extrabold tracking-wider text-white">
-          Voting System
+          E-Voting System
         </h1>
 
         {/* NavLinks */}
