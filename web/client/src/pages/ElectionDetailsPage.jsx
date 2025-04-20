@@ -13,57 +13,67 @@ const ElectionDetailPage = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
 
-  // Retrieve and parse user from localStorage
-  const storedUser = localStorage.getItem("user");
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const isLoggedIn = !!user?.id;
+  // Get fresh user data on every render
+  const getCurrentUser = () => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      return null;
+    }
+  };
 
-  // Countdown hook
+  const user = getCurrentUser();
+  const userId = user?.id;
+  const isLoggedIn = Boolean(userId);
+
   const timeLeft = useCountdown(election?.endDate);
 
-  useEffect(() => {
-    const fetchElection = async () => {
-      setLoading(true);
-      try {
-        const data = await getElectionById(id);
-        // Determine if the user has voted based on the voters array
-        if (user && Array.isArray(data.voters)) {
-          setHasVoted(data.voters.includes(user.id));
-        }
-        setElection(data);
-      } catch (err) {
-        setError(err.message || "Failed to fetch election");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchElection();
+  // Unified data fetching with proper dependencies
+  const fetchElectionData = async () => {
+    try {
+      const data = await getElectionById(id);
+      const voters = Array.isArray(data.voters) ? data.voters.map(String) : [];
+      setHasVoted(isLoggedIn && voters.includes(String(userId)));
+      setElection(data);
+    } catch (err) {
+      setError(err.message || "Failed to fetch election");
+    } finally {
+      setLoading(false);
     }
-  }, [id]);
+  };
+
+  useEffect(() => {
+    if (id) {
+      setLoading(true);
+      fetchElectionData();
+    }
+  }, [id, userId]); // Re-fetch when user ID changes
 
   const handleVote = async (candidateId) => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
+    if (!isLoggedIn) return navigate("/login");
+    if (hasVoted) return alert("You have already voted.");
+
     try {
+      // Get fresh election data before voting
+      const currentElection = await getElectionById(id);
+      const currentVoters = Array.isArray(currentElection.voters) 
+        ? currentElection.voters.map(String) 
+        : [];
+
+      if (currentVoters.includes(String(userId))) {
+        setHasVoted(true);
+        return alert("You have already voted in this election.");
+      }
+
+      // Perform actual voting
       await castVote(id, candidateId);
-      setElection((prev) => ({
-        ...prev,
-        totalVotes: (prev.totalVotes || 0) + 1,
-        results: prev.results.map((result) =>
-          result.candidate._id === candidateId
-            ? { ...result, votes: result.votes + 1 }
-            : result
-        ),
-        voters: Array.isArray(prev.voters) ? [...prev.voters, user.id] : [user.id]
-      }));
+      alert("Vote cast successfully!");
       setHasVoted(true);
-    } catch (error) {
-      alert(error.response?.data?.message || 
-        "Voting failed");
+      // Re-fetch fresh data after successful vote
+      await fetchElectionData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Voting failed. Please try again.");
     }
   };
 
@@ -91,11 +101,9 @@ const ElectionDetailPage = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-wrap justify-between items-center gap-4">
             <span className={`px-3 py-1 rounded-full ${
-              electionStatus === 'upcoming'
-                ? 'bg-blue-200 text-blue-800'
-                : electionStatus === 'active'
-                ? 'bg-green-200 text-green-800'
-                : 'bg-gray-200 text-gray-800'
+              electionStatus === 'upcoming' ? 'bg-blue-200 text-blue-800' :
+              electionStatus === 'active' ? 'bg-green-200 text-green-800' :
+              'bg-gray-200 text-gray-800'
             }`}>{electionStatus.toUpperCase()}</span>
 
             {electionStatus === 'active' && (
@@ -128,7 +136,7 @@ const ElectionDetailPage = () => {
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {election.candidates.map((candidate) => (
+                {election.candidates.map(candidate => (
                   <div
                     key={candidate._id}
                     className="p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow-lg transition-shadow cursor-pointer"
@@ -149,7 +157,7 @@ const ElectionDetailPage = () => {
           <section className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-semibold text-blue-600 mb-4">Final Results</h2>
             <div className="space-y-4">
-              {election.results.map((result) => (
+              {election.results.map(result => (
                 <div key={result.candidate._id} className="p-4 bg-blue-50 rounded-lg">
                   <div className="flex justify-between items-center">
                     <div>

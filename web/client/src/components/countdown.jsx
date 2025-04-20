@@ -1,3 +1,4 @@
+// countdown.jsx
 import { useState, useEffect } from 'react';
 
 export const useCountdown = (targetDate) => {
@@ -11,33 +12,24 @@ export const useCountdown = (targetDate) => {
   useEffect(() => {
     if (!targetDate) return;
 
-    const calculateTimeLeft = () => {
+    const interval = setInterval(() => {
       const now = new Date().getTime();
       const targetTime = new Date(targetDate).getTime();
       const difference = targetTime - now;
 
       if (difference > 0) {
-        return {
+        setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
           hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((difference % (1000 * 60)) / 1000)
-        };
+        });
+      } else {
+        clearInterval(interval);
       }
-
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    };
-
-    // Initial calculation
-    setTimeLeft(calculateTimeLeft());
-
-    // Update every second
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
     }, 1000);
 
-    // Cleanup
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, [targetDate]);
 
   return timeLeft;

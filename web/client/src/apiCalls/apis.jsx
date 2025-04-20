@@ -33,6 +33,12 @@ export const logoutUser = () => {
 
 // — Request a password‐reset token —  
 // email: string
+
+export const getCompletedElections = async () => {
+  const res = await api.get('/api/elections/results');
+  return res.data;
+};
+
 export const requestPasswordReset = async (email) => {
   const res = await api.post("/api/auth/reset-password-request", { email });
   return res.data; // { message, resetToken } (in prod you’d email it instead)
@@ -94,11 +100,21 @@ export const getPendingCandidates = async () => {
     const res = await api.post(`/api/elections/${electionId}/end`);
     return res.data;
   };
-  
-  export const getElectionResults = async (electionId) => {
-    const res = await api.get(`/api/elections/${electionId}/results`);
+  export const startElection = async (electionId) => {
+    const res = await api.patch(`/api/elections/${electionId}/start`);
     return res.data;
   };
+  export const getElectionResults = async (electionId) => {
+    console.log("Fetching election results...", electionId);
+    const res = await api.get(`/api/elections/results/${electionId}`);
+    return res.data;
+  };
+
+  export const deleteElection = async (electionId) => {
+    const res = await api.delete(`/api/elections/${electionId}`);
+    return res.data;
+  };
+
   
   // ——— Candidate Management ———
   export const getElectionCandidates = async (electionId) => {

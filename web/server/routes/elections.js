@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Get all elections
 router.get('/', auth, async (req, res) => {
+  console.log('Fetching all elections');
   try {
     const elections = await Election.find()
       .populate('candidates', 'username candidateInfo')
@@ -18,8 +19,64 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get single election
+router.get('/results', auth, async (req, res) => {
+  try {
+    const elections = await Election.find({
+      $or: [
+        { status: 'completed' },
+        { endDate: { $lt: new Date() } },
+        { isResultPublished: true }
+      ]
+    }).select('title constituency startDate endDate totalVotes status isResultPublished');
+    
+    res.json(elections);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/results/:id', auth, async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const election = await Election.findById(req.params.id)
+      .populate('candidates', 'username candidateInfo')
+      .populate('results.candidate', 'username candidateInfo');
+      console.log(election);
+    if (!election) {
+      return res.status(404).json({ message: 'Election not found' });
+    }
+
+    if (!election.isResultPublished && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Results not yet published' });
+    }
+    
+    res.json({
+      title: election.title,
+      description: election.description,
+      constituency: election.constituency,
+      status: election.status,
+      startDate: election.startDate,
+      endDate: election.endDate,
+      totalVotes: election.totalVotes,
+      candidates:election.candidates,
+      isResultPublished: election.isResultPublished,
+      results: election.results.map(result => ({
+        candidate: {
+          username: result.candidate.username,
+          party: result.candidate.candidateInfo.party,
+          position: result.candidate.candidateInfo.position
+        },
+        votes: result.votes,
+        percentage: result.percentage
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get('/:id', auth, async (req, res) => {
+  console.log('Fetching election details');
   try {
     const election = await Election.findById(req.params.id)
       .populate('candidates', 'username candidateInfo')
@@ -30,6 +87,7 @@ router.get('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Election not found' });
     }
     const getElectionStatus = (startDate, endDate) => {
+
       const now = new Date();
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -54,8 +112,114 @@ router.get('/:id', auth, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-// Create new election (admin only)
+
+// Cast vote
+router.post('/:id/vote', auth, async (req, res) => {
+  console.log('Casting vote');
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    
+    if (req.user.role !== 'voter') {
+      return res.status(403).json({ message: 'Only voters can cast votes' });
+    }
+
+    const election = await Election.findById(req.params.id).session(session);
+    if (!election) {
+      return res.status(404).json({ message: 'Election not found' });
+    }
+
+    if (!election.voters) {
+      election.voters = [];
+    }
+
+    const getElectionStatus = (startDate, endDate) => {
+      const now = new Date();
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      if (now < start) return 'upcoming';
+      if (now > end) return 'completed';
+      return 'active';
+    };
+    election.status = getElectionStatus(election.startDate, election.endDate);
+    const now = new Date();
+    const startDate = new Date(election.startDate);
+    const endDate = new Date(election.endDate);
+
+    if (election.status !== 'active' || now < startDate || now > endDate) {
+      return res.status(400).json({ message: 'Election is not currently active' });
+    }
+
+    if (election.voters.includes(req.user.userId)) {
+      return res.status(400).json({ message: 'You have already voted in this election' });
+    }
+
+    const candidateId = req.body.candidateId;
+    if (!election.candidates.map(c => c.toString()).includes(candidateId)) {
+      return res.status(404).json({ message: 'Invalid candidate' });
+    }
+
+    const voteRecord = new VoteRecord({
+      voter: req.user.userId,
+      electionId: election._id,
+      encryptedData: VoteRecord.encryptVote({
+        electionTitle: election.title,
+        candidateId: candidateId,
+        timestamp: now
+      }, req.user.userId)
+    });
+
+    await voteRecord.save({ session });
+
+    election.voters.push(req.user.userId);
+    election.totalVotes = (election.totalVotes || 0) + 1;
+
+    const candidateObjectId = new mongoose.Types.ObjectId(candidateId);
+    const resultIndex = election.results.findIndex(r => 
+      r.candidate.equals(candidateObjectId)
+    );
+
+    if (resultIndex === -1) {
+      election.results.push({ 
+        candidate: candidateObjectId, 
+        votes: 1 
+      });
+    } else {
+      election.results[resultIndex].votes += 1;
+    }
+
+    await User.findByIdAndUpdate(
+      req.user.userId,
+      { $set: { hasVoted: true } },
+      { session }
+    );
+
+    const updatedElection = await election.save({ session });
+    await session.commitTransaction();
+
+    res.json({ 
+      message: 'Vote cast successfully',
+      election: {
+        _id: updatedElection._id,
+        totalVotes: updatedElection.totalVotes,
+        results: updatedElection.results
+      }
+    });
+
+  } catch (error) {
+    await session.abortTransaction();
+    console.error('Voting error:', error);
+    res.status(500).json({ 
+      message: error.message || 'Failed to process vote'
+    });
+  } finally {
+    session.endSession();
+  }
+});
+
 router.post('/', auth, async (req, res) => {
+  console.log('Creating new election');
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied' });
@@ -87,108 +251,11 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Cast vote
-router.post('/:id/vote', auth, async (req, res) => {
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction();
-    
-    if (req.user.role !== 'voter') {
-      return res.status(403).json({ message: 'Only voters can cast votes' });
-    }
 
-    const election = await Election.findById(req.params.id).session(session);
-    if (!election) {
-      return res.status(404).json({ message: 'Election not found' });
-    }
-
-    // Initialize voters array if undefined
-    if (!election.voters) {
-      election.voters = [];
-    }
-
-    // Convert to Date objects for comparison
-    const now = new Date();
-    const startDate = new Date(election.startDate);
-    const endDate = new Date(election.endDate);
-
-    if (election.status !== 'active' || now < startDate || now > endDate) {
-      return res.status(400).json({ message: 'Election is not currently active' });
-    }
-
-    if (election.voters.includes(req.user.userId)) {
-      return res.status(400).json({ message: 'You have already voted in this election' });
-    }
-
-    const candidateId = req.body.candidateId;
-    if (!election.candidates.map(c => c.toString()).includes(candidateId)) {
-      return res.status(404).json({ message: 'Invalid candidate' });
-    }
-
-    // Create encrypted vote record
-    const voteRecord = new VoteRecord({
-      voter: req.user.userId,
-      electionId: election._id,
-      encryptedData: VoteRecord.encryptVote({
-        electionTitle: election.title,
-        candidateId: candidateId,
-        timestamp: now
-      }, req.user.userId)
-    });
-
-    await voteRecord.save({ session });
-
-    // Update election
-    election.voters.push(req.user.userId);
-    election.totalVotes = (election.totalVotes || 0) + 1;
-
-    // Update results
-    const candidateObjectId = new mongoose.Types.ObjectId(candidateId);
-    const resultIndex = election.results.findIndex(r => 
-      r.candidate.equals(candidateObjectId)
-    );
-
-    if (resultIndex === -1) {
-      election.results.push({ 
-        candidate: candidateObjectId, 
-        votes: 1 
-      });
-    } else {
-      election.results[resultIndex].votes += 1;
-    }
-
-    // Update user's voting status
-    await User.findByIdAndUpdate(
-      req.user.userId,
-      { $set: { hasVoted: true } },
-      { session }
-    );
-
-    const updatedElection = await election.save({ session });
-    await session.commitTransaction();
-
-    res.json({ 
-      message: 'Vote cast successfully',
-      election: {
-        _id: updatedElection._id,
-        totalVotes: updatedElection.totalVotes,
-        results: updatedElection.results
-      }
-    });
-
-  } catch (error) {
-    await session.abortTransaction();
-    console.error('Voting error:', error);
-    res.status(500).json({ 
-      message: error.message || 'Failed to process vote'
-    });
-  } finally {
-    session.endSession();
-  }
-});
 
 // Get user's voting history (only accessible by the voter)
 router.post('/my-voting-history', auth, async (req, res) => {
+  console.log('Fetching voting history');
     const { userId } = req.body;
     console.log(userId);
   if (!userId) {
@@ -219,6 +286,7 @@ router.post('/my-voting-history', auth, async (req, res) => {
 
 // End election and publish results (admin only)
 router.post('/:id/end', auth, async (req, res) => {
+  console.log('Ending election and publishing results');
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied' });
@@ -239,6 +307,7 @@ router.post('/:id/end', auth, async (req, res) => {
     });
 
     election.status = 'completed';
+    election.endDate = new Date();
     election.isResultPublished = true;
     await election.save();
 
@@ -255,44 +324,12 @@ router.post('/:id/end', auth, async (req, res) => {
   }
 });
 
+
+
 // Get election results (if published)
-router.get('/:id/results', auth, async (req, res) => {
-  try {
-    const election = await Election.findById(req.params.id)
-      .populate('candidates', 'username candidateInfo')
-      .populate('results.candidate', 'username candidateInfo');
-    
-    if (!election) {
-      return res.status(404).json({ message: 'Election not found' });
-    }
 
-    if (!election.isResultPublished && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Results not yet published' });
-    }
-
-    res.json({
-      title: election.title,
-      description: election.description,
-      constituency: election.constituency,
-      status: election.status,
-      startDate: election.startDate,
-      endDate: election.endDate,
-      totalVotes: election.totalVotes,
-      results: election.results.map(result => ({
-        candidate: {
-          username: result.candidate.username,
-          party: result.candidate.candidateInfo.party,
-          position: result.candidate.candidateInfo.position
-        },
-        votes: result.votes,
-        percentage: result.percentage
-      }))
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 router.get('/:id/elections', auth, async (req, res) => {
+  console.log('Fetching elections for candidate');
   try {
     const elections = await Election.find({
       candidates: req.params.id
@@ -303,5 +340,31 @@ router.get('/:id/elections', auth, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+router.patch('/:id/start', auth, async (req, res) => {
+  try {
+    const election = await Election.findByIdAndUpdate(
+      req.params.id,
+      { status: 'active' },
+      { new: true }
+    );
+    res.json(election);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await Election.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Election deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
 
 module.exports = router;
