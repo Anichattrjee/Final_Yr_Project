@@ -5,11 +5,12 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
 import CurrentStatusPage from "./pages/CurrentStatus";
-import Result from "./pages/Result";
+import CompletedElectionsList from "./pages/Result";
 import ElectionListingPage from "./pages/ElectionListingPage";
 import VoterProfilePage from "./pages/VoterPorfile";
 import CandidateProfilePage from "./pages/CandidateProfilePage";
 import ElectionDetailPage from './pages/ElectionDetailsPage';
+import ElectionResultPage from './pages/ElectionResult';
 
 const App = () => {
   const isLogedin = localStorage.getItem("user") ? true : false;
@@ -20,12 +21,13 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/election" element={<CurrentStatusPage />} />
-        <Route path="/results" element = {<Result/>}/>
+        <Route path="/results" element = {<CompletedElectionsList/>}/>
+        <Route path="/results/:id" element={<ElectionResultPage/>} />
         <Route path="/elections" element={<ElectionListingPage isLoggedIn={isLogedin}  />} />
         <Route path="/profile" element={<VoterProfilePage/>} />
         <Route path="/candidate-profile" element={<CandidateProfilePage />} />
         <Route path="/elections/:id" element={<ElectionDetailPage />} />
-        <Route path="current-status" element={<CurrentStatusPage />} />
+        <Route path="/current-status" element={<CurrentStatusPage />} />
         
       </Routes>
   );

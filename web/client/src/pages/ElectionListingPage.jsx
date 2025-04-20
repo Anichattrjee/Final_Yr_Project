@@ -34,7 +34,7 @@ const ElectionListingPage = ({ isLoggedIn}) => {
       const statusMatch = filters.status === 'all' || 
         (filters.status === 'upcoming' && new Date(election.startDate) > now) ||
         (filters.status === 'active' && new Date(election.startDate) <= now && new Date(election.endDate) >= now) ||
-        (filters.status === 'completed' && new Date(election.endDate) < now);
+        (filters.status === 'completed' && new Date(election.endDate) < now && election.status);
       
       const constituencyMatch = filters.constituency === 'all' || 
         election.constituency === filters.constituency;

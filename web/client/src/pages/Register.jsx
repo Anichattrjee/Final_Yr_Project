@@ -25,36 +25,55 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { username, email, password, voterID, role, party, position, constituency } = formData;
-
-    // Basic validation
+  
+    // Enhanced validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!username || !email || !password || !voterID) {
       alert("Please fill in all required fields!");
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address!");
       return;
     }
     if (role === "candidate" && (!party || !position || !constituency)) {
       alert("Please fill in all candidate details!");
       return;
     }
-
+  
     setLoading(true);
     try {
-      const payload = { username, email, password, voterID, role };
-      if (role === "candidate") {
-        payload.party = party;
-        payload.position = position;
-        payload.constituency = constituency;
-      }
+      const payload = { 
+        username, 
+        email, 
+        password, 
+        voterID, 
+        role,
+        // Correct candidate info structure
+        ...(role === "candidate" && {
+          candidateInfo: {
+            party,
+            position,
+            constituency
+          }
+        })
+      };
+  
       const res = await registerUser(payload);
       alert(res.message || "Registration successful! Please await approval if applicable.");
       navigate("/login");
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || error.message || "Registration failed.");
+      const errorMessage = error.response?.data?.message || error.message;
+      if (errorMessage.includes("duplicate")) {
+        alert("This email or voter ID is already registered!");
+      } else {
+        alert(errorMessage || "Registration failed.");
+      }
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md border border-blue-200">
