@@ -11,6 +11,7 @@ import VoterProfilePage from "./pages/VoterPorfile";
 import CandidateProfilePage from "./pages/CandidateProfilePage";
 import ElectionDetailPage from './pages/ElectionDetailsPage';
 import ElectionResultPage from './pages/ElectionResult';
+import AboutUs from "./pages/AboutUs";
 
 const App = () => {
   const isLogedin = localStorage.getItem("user") ? true : false;
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/candidate-profile" element={<CandidateProfilePage />} />
         <Route path="/elections/:id" element={<ElectionDetailPage />} />
         <Route path="/current-status" element={<CurrentStatusPage />} />
+        <Route path = "/about" element = {<AboutUs/>} />
         
       </Routes>
   );

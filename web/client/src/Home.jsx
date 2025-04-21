@@ -17,7 +17,7 @@ const Home = () => {
       <Carousel />
       <div className="bg-gray-100 py-12">
         <h1 className="text-center text-4xl font-extrabold text-blue-600 mb-6">
-          Welcome to the Voting System, {userName}!
+          Welcome to the Voting System !
         </h1>
         <p className="text-center text-gray-700 text-lg mb-12">
           Make your voice heard with our secure and efficient voting platform.
