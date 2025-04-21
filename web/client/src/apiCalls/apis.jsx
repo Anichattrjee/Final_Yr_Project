@@ -9,14 +9,14 @@ const api = axiosInstance();
 // if role === 'candidate', it may also include:
 //   { party, position, constituency }
 export const registerUser = async (userData) => {
-  const res = await api.post("/api/auth/register", userData);
+  const res = await axiosInstance.post("/api/auth/register", userData);
   return res.data; // { message: 'Registration successful, awaiting approval if candidate' }
 };
 
 // — Login —  
 // creds: { email, password }
 export const loginUser = async (creds) => {
-  const res = await api.post("/api/auth/login", creds);
+  const res = await axiosInstance.post("/api/auth/login", creds);
   const { token, user } = res.data;
 
   // persist token for future requests
@@ -35,28 +35,28 @@ export const logoutUser = () => {
 // email: string
 
 export const getCompletedElections = async () => {
-  const res = await api.get('/api/elections/results');
+  const res = await axiosInstance.get('/api/elections/results');
   return res.data;
 };
 
 export const requestPasswordReset = async (email) => {
-  const res = await api.post("/api/auth/reset-password-request", { email });
+  const res = await axiosInstance.post("/api/auth/reset-password-request", { email });
   return res.data; // { message, resetToken } (in prod you’d email it instead)
 };
 
 export const resetPassword = async (token, newPassword) => {
-  const res = await api.post("/api/auth/reset-password", { token, newPassword });
+  const res = await axiosInstance.post("/api/auth/reset-password", { token, newPassword });
   return res.data; // { message: 'Password reset successful' }
 };
 
 
 export const getPendingCandidates = async () => {
-    const response = await api.get("/api/admin/pending-candidates");
+    const response = await axiosInstance.get("/api/admin/pending-candidates");
     return response.data;
   };
 
   export const setCandidateApproval = async (candidateId, approved) => {
-    const response = await api.post(
+    const response = await axiosInstance.post(
       `/api/admin/approve-candidate/${candidateId}`,
       { approved }
     );
@@ -64,64 +64,64 @@ export const getPendingCandidates = async () => {
   };
 
   export const getApprovedCandidates = async () => {
-    const res = await api.get('/api/admin/approved-candidates');
+    const res = await axiosInstance.get('/api/admin/approved-candidates');
     return res.data;
   };
   
 
   export const getAllElections = async () => {
-    const res = await api.get("/api/elections");
+    const res = await axiosInstance.get("/api/elections");
     return res.data;
   };
   
   export const getElectionById = async (electionId) => {
-    const res = await api.get(`/api/elections/${electionId}`);
+    const res = await axiosInstance.get(`/api/elections/${electionId}`);
     return res.data;
   };
   
   export const createElection = async (electionData) => {
-    const res = await api.post("/api/elections", electionData);
+    const res = await axiosInstance.post("/api/elections", electionData);
     return res.data;
   };
   
   // ——— Voting Actions ———
   export const castVote = async (electionId, candidateId) => {
-    const res = await api.post(`/api/elections/${electionId}/vote`, { candidateId });
+    const res = await axiosInstance.post(`/api/elections/${electionId}/vote`, { candidateId });
     return res.data;
   };
   
   export const getMyVotingHistory = async (userId) => {
-    const res = await api.post("/api/elections/my-voting-history", { userId });
+    const res = await axiosInstance.post("/api/elections/my-voting-history", { userId });
     return res.data;
   };
   
   // ——— Admin Controls ———
   export const endElection = async (electionId) => {
-    const res = await api.post(`/api/elections/${electionId}/end`);
+    const res = await axiosInstance.post(`/api/elections/${electionId}/end`);
     return res.data;
   };
   export const startElection = async (electionId) => {
-    const res = await api.patch(`/api/elections/${electionId}/start`);
+    const res = await axiosInstance.patch(`/api/elections/${electionId}/start`);
     return res.data;
   };
   export const getElectionResults = async (electionId) => {
     console.log("Fetching election results...", electionId);
-    const res = await api.get(`/api/elections/results/${electionId}`);
+    const res = await axiosInstance.get(`/api/elections/results/${electionId}`);
     return res.data;
   };
 
   export const deleteElection = async (electionId) => {
-    const res = await api.delete(`/api/elections/${electionId}`);
+    const res = await axiosInstance.delete(`/api/elections/${electionId}`);
     return res.data;
   };
 
   
   // ——— Candidate Management ———
   export const getElectionCandidates = async (electionId) => {
-    const res = await api.get(`/api/elections/${electionId}`);
+    const res = await axiosInstance.get(`/api/elections/${electionId}`);
     return res.data.candidates;
   };
   export const getCandidateElections = async (candidateId) => {
-    const res = await api.get(`/api/elections/${candidateId}/elections`);
+    const res = await axiosInstance.get(`/api/elections/${candidateId}/elections`);
     return res.data;
   };

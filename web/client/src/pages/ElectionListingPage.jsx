@@ -131,7 +131,7 @@ const ElectionListingPage = ({ isLoggedIn}) => {
     to={`/elections/${election._id}/results`}
     className="text-blue-600 hover:underline"
   >
-    View Results
+   
   </Link>
 ) : (
   <Link 

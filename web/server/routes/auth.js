@@ -89,7 +89,7 @@ router.post('/login', async (req, res) => {
     if (!user.password) {
       return res.status(500).json({ message: 'Authentication system error' });
     }
-
+    console.log('User found:', user);
     const isMatch = await bcrypt.compare(trimmedPassword, user.password);
     
     // if (!isMatch) {
@@ -100,10 +100,10 @@ router.post('/login', async (req, res) => {
     if (user.role === 'candidate' && !user.candidateInfo.approved) {
       return res.status(401).json({ message: 'Candidate account pending approval' });
     }
-
+    const jwtSecret = process.env.JWT_SECRET || 'your-secure-secret-key';
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
+      jwtSecret, 
       { expiresIn: '24h' }
     );
 
