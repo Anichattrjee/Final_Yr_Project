@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 class TimeController extends GetxController {
   final RxString currentTime = ''.obs;
   final String sessionStartTime;
+  final RxString endTime = ''.obs;
   late Timer _timer;
 
   TimeController() : sessionStartTime = _getCurrentFormattedTime();

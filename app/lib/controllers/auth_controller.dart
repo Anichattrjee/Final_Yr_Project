@@ -35,7 +35,8 @@ class AuthController extends GetxController {
         await LocalStorage.saveUserDetails(
             name: data['user']['username'],
             email: data['user']['email'],
-            pwd: password);
+            pwd: password,
+            uid: data['user']['id']);
         debugPrint('user loggedIn' + loggedIn.value.toString());
         Get.snackbar("Login Success", "Welcome, ${data['user']['username']}!");
         return true;

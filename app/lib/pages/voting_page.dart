@@ -1,3 +1,4 @@
+import 'package:app/dump/voting_section.dart';
 import 'package:app/utils/AppColors.dart';
 import 'package:flutter/material.dart';
 
@@ -32,8 +33,9 @@ class _VotingPageState extends State<VotingPage> {
           ),
         ),
       ),
-      body: Center(
-        child: Text("VOTINGPAGE"),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: VotingSection(),
       ),
     );
   }
