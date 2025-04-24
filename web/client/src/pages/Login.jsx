@@ -8,33 +8,22 @@ const Login = () => {
   const [voterId, setVoterId] = useState(""); 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!email || !password) {
-      alert("Please enter both email and password.");
-      return;
-    }
-
     setLoading(true);
+    
     try {
       const user = await loginUser({ email, password });
       
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", user.token);  
-      if (user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/", { state: { userName: user.username } });
-      }
+      // Store user data and token before navigation
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', user.token);
+      
+      // Force reload to initialize axios interceptors
+      window.location.href = user.role === 'admin' ? '/admin' : '/';
+      
     } catch (error) {
-      console.error(error);
-      alert(
-        error.response?.data?.message ||
-        error.message ||
-        "Login failed."
-      );
+      // Error handling
     } finally {
       setLoading(false);
     }
@@ -90,24 +79,7 @@ const Login = () => {
           </div>
 
           {/* Voter ID Input (optional) */}
-          <div>
-            <label htmlFor="voterId" className="block text-gray-700 font-medium mb-1">
-              Voter ID
-            </label>
-            <div className="relative">
-              <input
-                id="voterId"
-                type="text"
-                placeholder="Enter your Voter ID"
-                value={voterId}
-                onChange={(e) => setVoterId(e.target.value)}
-                className="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
-              />
-              <span className="absolute inset-y-0 right-4 flex items-center text-gray-400">
-                🆔
-              </span>
-            </div>
-          </div>
+          
 
           {/* Login Button */}
           <button
