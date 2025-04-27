@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:app/database/local_storage.dart';
 import 'package:app/utils/AppColors.dart';
 import 'package:app/utils/AppConstant.dart';
@@ -29,7 +28,7 @@ class AuthController extends GetxController {
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         loggedIn.value = true;
-        token.value = data['token'];
+        token.value = data['user']['token'];
         user.value = data['user'];
 
         await LocalStorage.saveUserDetails(
@@ -45,6 +44,7 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = e.toString();
+      debugPrint("error is " + e.toString());
       Get.snackbar("Login Failed", errorMessage.value,
           backgroundColor: AppColors.white);
     } finally {
@@ -81,7 +81,7 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      debugPrint(e.toString());
+      debugPrint("error is " + e.toString());
       Get.snackbar("Registration Failed", errorMessage.value,
           backgroundColor: AppColors.white);
       return false;

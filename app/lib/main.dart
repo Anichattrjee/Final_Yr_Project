@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:app/auth/auth_wrapper.dart';
 import 'package:app/dump/voting_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
 import 'controllers/navigation_controller.dart';
 import 'widgets/custom_cicular_progress.dart';
+
 void main() async {
   await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,13 +16,14 @@ void main() async {
   Get.put(VotingController());
   runApp(const MainApp());
 }
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       home: FutureBuilder<Widget>(
-        future: AuthWrapper().navigateUser(), 
+        future: AuthWrapper().navigateUser(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(

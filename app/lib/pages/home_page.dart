@@ -1,4 +1,3 @@
-import 'package:app/controllers/auth_controller.dart';
 import 'package:app/controllers/time_controller.dart';
 import 'package:app/dump/voting_section.dart';
 import 'package:app/utils/AppColors.dart';
@@ -15,7 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final AuthController authController = Get.put(AuthController());
   final TimeController timeController = Get.put(TimeController());
   String? name;
   String? email;
