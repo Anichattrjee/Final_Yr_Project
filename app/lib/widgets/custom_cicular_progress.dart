@@ -13,7 +13,7 @@ class CustomCircularProgress extends StatelessWidget {
         width: 70.0,
         height: 70.0,
         decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.primaryBlue : AppColors.primaryBlue,
+          color: isDarkMode ? AppColors.primaryBlue : AppColors.white,
           shape: BoxShape.circle,
           boxShadow: const [
             BoxShadow(
@@ -26,7 +26,7 @@ class CustomCircularProgress extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: CircularProgressIndicator(
           strokeWidth: 5.0,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryBlue),
           backgroundColor: Colors
               .transparent, // Transparent background to blend with container
         ),

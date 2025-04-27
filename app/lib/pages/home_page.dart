@@ -1,5 +1,6 @@
 import 'package:app/controllers/auth_controller.dart';
 import 'package:app/controllers/time_controller.dart';
+import 'package:app/dump/voting_section.dart';
 import 'package:app/utils/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -62,57 +63,59 @@ class _HomePageState extends State<HomePage> {
           children: [
             if (name != null)
               Text(
-                'Hi, $name 👋',
+                'Hello, $name 👋',
                 style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                   color: AppColors.primaryBlue,
                 ),
               ),
-            const SizedBox(height: 12),
-            Obx(() => Text(
-                  'Session Started: ${timeController.currentTime.value}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.primaryBlue.withOpacity(0.7),
-                  ),
+            const SizedBox(height: 16),
+            Text(
+              'Session Started',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.grey.withOpacity(0.9),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              timeController.sessionStartTime,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Obx(() => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Time',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.grey.withOpacity(0.9),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      timeController.currentTime.value,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
                 )),
-            const SizedBox(height: 32),
-            // Card(
-            //   elevation: 4,
-            //   shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(16)),
-            //   color: AppColors.primaryBlue.withOpacity(0.05),
-            //   child: Padding(
-            //     padding: const EdgeInsets.all(24.0),
-            //     child: Column(
-            //       children: [
-            //         Icon(Icons.person, color: AppColors.primaryBlue, size: 50),
-            //         const SizedBox(height: 16),
-            //         if (name != null)
-            //           Text(
-            //             name!,
-            //             style: TextStyle(
-            //               fontSize: 20,
-            //               fontWeight: FontWeight.bold,
-            //               color: AppColors.primaryBlue,
-            //             ),
-            //           ),
-            //         if (email != null)
-            //           Padding(
-            //             padding: const EdgeInsets.only(top: 8.0),
-            //             child: Text(
-            //               email!,
-            //               style: TextStyle(
-            //                 fontSize: 14,
-            //                 color: AppColors.primaryBlue.withOpacity(0.8),
-            //               ),
-            //             ),
-            //           ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
+            const SizedBox(height: 24),
+            Divider(
+              color: AppColors.primaryBlue,
+              thickness: 1.2,
+            ),
+            const SizedBox(height: 24),
+            VotingSection(),
           ],
         ),
       ),

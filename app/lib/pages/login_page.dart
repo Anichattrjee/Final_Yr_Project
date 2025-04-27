@@ -1,3 +1,4 @@
+import 'package:app/pages/request_reset_password_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -158,7 +159,9 @@ class LoginPage extends StatelessWidget {
                       Text('Forgot your password?',
                           style: TextStyle(color: AppColors.grey)),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.off(() => RequestResetPage());
+                        },
                         child: Text('Reset Here',
                             style: TextStyle(color: AppColors.primaryBlue)),
                       ),

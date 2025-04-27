@@ -12,7 +12,7 @@ class AuthWrapper {
   var _loggedIn;
   String? _email = '';
   String? _password = '';
-
+  
   Future<Widget> navigateUser() async {
     await fetchUser();
 
