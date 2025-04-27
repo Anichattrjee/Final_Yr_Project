@@ -1,9 +1,9 @@
-const nodemailer = require("nodemailer");
+const nodemailer=require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 
 //create the transporter
-export const createTransporter = () => {
+const createTransporter = () => {
   return nodemailer.createTransporter({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
@@ -15,7 +15,7 @@ export const createTransporter = () => {
   });
 };
 
-export const sendPasswordResetEmail = async (email, resetUrl, userData) => {
+const sendPasswordResetEmail = async (email, resetUrl, userData) => {
   try {
     const transporter = createTransporter();
 
@@ -49,3 +49,4 @@ export const sendPasswordResetEmail = async (email, resetUrl, userData) => {
 };
 
 
+module.exports={createTransporter, sendPasswordResetEmail};
