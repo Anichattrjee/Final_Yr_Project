@@ -61,6 +61,7 @@ router.post("/register", async (req, res) => {
           : "Registration successful!",
     });
   } catch (error) {
+    console.log("error in register controller");
     // Handle duplicate key errors
     if (error.code === 11000) {
       return res.status(400).json({ message: "User already exists" });
@@ -74,8 +75,7 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    console.log(email);
-    console.log(password);
+    
     
 
     if (!email || !password) {
@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials: no user" });
     }
 
-    console.log(user);
+    
 
     // Verify password exists in user document
     if (!user.password) {
@@ -120,7 +120,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "24h",
     });
 
-    res.json({
+    res.status(200).cookie("token",token).json({
       user: {
         id: user._id,
         username: user.username,
@@ -132,6 +132,7 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("error in login controller");
     res.status(500).json({ message: error.message });
   }
 });
