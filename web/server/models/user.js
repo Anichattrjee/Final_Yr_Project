@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -41,6 +42,10 @@ const userSchema = new mongoose.Schema({
     party: String,
     position: String,
     constituency: String,
+    electionCode:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Election'
+    },
     approved: {
       type: Boolean,
       default: false

@@ -78,7 +78,7 @@ const seedData = async () => {
       constituency: 'State A',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-01-02'),
-      candidates: candidates.map(c => c._id),
+      // candidates: candidates.map(c => c._id),
       status: 'upcoming'
     });
 

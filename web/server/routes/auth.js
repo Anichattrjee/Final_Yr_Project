@@ -38,7 +38,8 @@ router.post("/register", async (req, res) => {
       if (
         !candidateInfo?.party ||
         !candidateInfo?.position ||
-        !candidateInfo?.constituency
+        !candidateInfo?.constituency ||
+        !candidateInfo.electionCode
       ) {
         return res
           .status(400)

@@ -34,11 +34,11 @@ router.post('/approve-candidate/:id', auth, adminOnly, async (req, res) => {
       return res.status(404).json({ message: 'Candidate not found' });
     }
 
-    candidate.candidateInfo.approved = approved;
+    candidate.candidateInfo.approved = true;
     await candidate.save();
 
     res.json({ 
-      message: `Candidate ${approved ? 'approved' : 'rejected'} successfully`,
+      message: `Candidate ${approved==='true' ? 'approved' : 'rejected'} successfully`,
       candidate
     });
   } catch (error) {

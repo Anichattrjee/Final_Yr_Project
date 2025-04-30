@@ -52,25 +52,25 @@ router.post('/', auth, async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
+    
     const election = new Election({
       title: req.body.title,
       description: req.body.description,
       constituency: req.body.constituency,
       startDate: req.body.startDate,
       endDate: req.body.endDate,
-      candidates: req.body.candidateIds
     });
 
-    // Validate candidates exist and are approved
-    const candidates = await User.find({
-      _id: { $in: req.body.candidateIds },
-      role: 'candidate',
-      'candidateInfo.approved': true
-    });
+    // // Validate candidates exist and are approved
+    // const candidates = await User.find({
+    //   _id: { $in: req.body.candidateIds },
+    //   role: 'candidate',
+    //   'candidateInfo.approved': true
+    // });
 
-    if (candidates.length !== req.body.candidateIds.length) {
-      return res.status(400).json({ message: 'Invalid or unapproved candidates selected' });
-    }
+    // if (candidates.length !== req.body.candidateIds.length) {
+    //   return res.status(400).json({ message: 'Invalid or unapproved candidates selected' });
+    // }
 
     const newElection = await election.save();
     res.status(201).json(newElection);
@@ -79,13 +79,44 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+//add candidates into election (admin only)
+router.post("/add-candidates-to-election/:id",async (req,res)=>{
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    //get the electionId from req.params (sent from frontend)
+    const {electionId}=req.params;
+    //find the approved candidates whose electionCode=this election's id
+    const approvedCandidates=await User.find({role:'candidate', electionCode:electionId, approved:true });
+    //if this election doesnt have any candidates
+    if(approvedCandidates.length===0)
+    {
+      return res.status(400).json({message:"No Candidates for this election yet."});
+    }
+    console.log(approvedCandidates);
+
+    //find the election with this id
+    const election=await Election.findById({electionId});
+    
+    if(!election){
+      return res.status(400).json({message:"Election Doesn't Exist."});
+    }
+
+    //add the candidates to  this election
+    election.candidates=approvedCandidates;
+
+    res.status(200).json({messages:"Candidates Added to this election successfully.",election});
+  } catch (error) {
+    console.log("Error in add-candidates-to-election controller. ",error.message);
+    res.status(500).json({message:error.message});
+  }
+});
+
+
 // Cast vote
 router.post('/:id/vote', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'voter') {
-      return res.status(403).json({ message: 'Only voters can cast votes' });
-    }
-
     const election = await Election.findById(req.params.id);
     if (!election) {
       return res.status(404).json({ message: 'Election not found' });

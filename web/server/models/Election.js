@@ -26,15 +26,13 @@ const electionSchema = new mongoose.Schema({
   },
   constituency: {
     type: String,
-    required: true
   },
   startDate: {
     type: Date,
-    required: true
+    default:()=>new Date(),
   },
   endDate: {
     type: Date,
-    required: true
   },
   candidates: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -62,5 +60,34 @@ const electionSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Ensure endDate is always 30 minutes after startDate
+electionSchema.pre('save', function (next) {
+  const now = new Date();
+
+  // Set endDate if not provided
+  if (!this.endDate && this.startDate) {
+    this.endDate = new Date(this.startDate.getTime() + 30 * 60 * 1000);
+  }
+
+  // Set status based on current time
+  if (now < this.startDate) {
+    this.status = 'upcoming';
+  } else if (now >= this.startDate && now <= this.endDate) {
+    this.status = 'active';
+  } else {
+    this.status = 'completed';
+  }
+
+  next();
+});
+
+//to re-evaluate status dynamically when fetching a document
+electionSchema.methods.getCurrentStatus = function () {
+  const now = new Date();
+  if (now < this.startDate) return 'upcoming';
+  if (now >= this.startDate && now <= this.endDate) return 'active';
+  return 'completed';
+};
 
 module.exports = mongoose.model('Election', electionSchema);
