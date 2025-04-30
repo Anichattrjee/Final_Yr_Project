@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  constituency:{
+    type:String,
+    required:true
+  },
   role: {
     type: String,
     enum: ['voter', 'admin', 'candidate'],
@@ -41,7 +45,6 @@ const userSchema = new mongoose.Schema({
   candidateInfo: {
     party: String,
     position: String,
-    constituency: String,
     electionCode:{
       type:mongoose.Schema.Types.ObjectId,
       ref:'Election'

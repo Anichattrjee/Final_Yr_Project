@@ -10,7 +10,7 @@ const router = express.Router();
 // Register new user
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password, voterID, role, candidateInfo } =
+    const { username, email, password, voterID, role,constituency ,candidateInfo } =
       req.body;
 
     // Validate required fields
@@ -32,13 +32,13 @@ router.post("/register", async (req, res) => {
       password:password.trim(),
       voterID,
       role:role || "voter",
+      constituency
     };
 
     if (role === "candidate") {
       if (
         !candidateInfo?.party ||
         !candidateInfo?.position ||
-        !candidateInfo?.constituency ||
         !candidateInfo.electionCode
       ) {
         return res

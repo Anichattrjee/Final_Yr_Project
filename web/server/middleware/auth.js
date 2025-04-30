@@ -23,6 +23,7 @@ const authMiddleware = (req, res, next) => {
       userId: decoded.userId,
       role: decoded.role,
     };
+    console.log("Req User: ",req.user);
 
     console.log("exited auth middleware.");
     next();

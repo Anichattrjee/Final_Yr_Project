@@ -80,122 +80,199 @@ router.post('/', auth, async (req, res) => {
 });
 
 //add candidates into election (admin only)
-router.post("/add-candidates-to-election/:id",async (req,res)=>{
+router.post("/add-candidate-to-election/:id",auth,async (req,res)=>{
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied' });
     }
     //get the electionId from req.params (sent from frontend)
-    const {electionId}=req.params;
-    //find the approved candidates whose electionCode=this election's id
-    const approvedCandidates=await User.find({role:'candidate', electionCode:electionId, approved:true });
+    const electionId=req.params.id;
+    console.log("ElectionId: ",electionId);
+    const candidateId=req.query.candidateId;
+    console.log("CandidateId: ",candidateId);
+
+    //find the approved candidate whose electionCode=this election's id
+    const approvedCandidate = await User.findOne({
+      _id: candidateId,
+      // role: 'candidate',
+      // candidateInfo: { $exists: true, $ne: null },
+      // 'candidateInfo.electionCode': electionId,
+      // 'candidateInfo.approved': true
+    });
+    
     //if this election doesnt have any candidates
-    if(approvedCandidates.length===0)
+    if(!approvedCandidate)
     {
-      return res.status(400).json({message:"No Candidates for this election yet."});
+      return res.status(404).json({message:"Candidate Not Found"});
     }
-    console.log(approvedCandidates);
+    console.log("Approved Candidate: ",approvedCandidate);
 
     //find the election with this id
-    const election=await Election.findById({electionId});
+    const election=await Election.findById(electionId);
     
     if(!election){
       return res.status(400).json({message:"Election Doesn't Exist."});
     }
 
     //add the candidates to  this election
-    election.candidates=approvedCandidates;
+    election.candidates.push(approvedCandidate);
+    const updatedElection=  await election.save();
 
-    res.status(200).json({messages:"Candidates Added to this election successfully.",election});
+    res.status(200).json({messages:"Candidate Added to this election successfully.",updatedElection});
   } catch (error) {
     console.log("Error in add-candidates-to-election controller. ",error.message);
     res.status(500).json({message:error.message});
   }
 });
 
+//add voters to the election(right now not needed)
+// router.post("/add-voters-to-election/:id",auth,async(req,res)=>{
+//   try {
+//     //extract the election id
+//     const {id}=req.params;
+
+//     //find the election
+//     const election=await Election.findById(id);
+
+//     if(!election)
+//     {
+//       return res.status(404).json({message:"Election doesn't exist."});
+//     }
+
+//     //now find the voters whose constituency=election.constituency
+//     const voters=await User.find({role:'voter',constituency:election.constituency});
+
+//     election.voters=voters;
+//     const updatedElection=await election.save();
+
+//     res.status(200).json({message:"Voters added to election successfully.", updatedElection});
+//   } catch (error) {
+//     console.log("Error in add-voters-to-election controller. ",error.message);
+//     res.status(500).json({message:error.message});
+//   }
+// });
+
+//get all candidates of an election
+router.get("/:id/candidates",auth,async (req,res)=>{
+  try {
+    const {id}=req.params;
+
+    const election=await Election.findById(id).populate('candidates');
+
+    if(!election)
+    {
+      return res.status(404).json({message:"Election doesn't exist."});
+    }
+
+    res.status(200).json({candidates:election.candidates});
+  } catch (error) {
+    console.log("Error in get-candidates-election controller. ",error.message);
+    res.status(500).json({message:error.message});
+  }
+})
 
 // Cast vote
 router.post('/:id/vote', auth, async (req, res) => {
   try {
+    // 1. Fetch the election by ID from the URL parameter
     const election = await Election.findById(req.params.id);
+
+    // 2. If no election found, return 404
     if (!election) {
       return res.status(404).json({ message: 'Election not found' });
     }
 
+    // 3. Check if election status is 'active' (extra validation)
     if (election.status !== 'active') {
       return res.status(400).json({ message: 'Election is not active' });
     }
 
+    // 4. Check if the current time is within the election's allowed timeframe
     const now = new Date();
     if (now < election.startDate || now > election.endDate) {
       return res.status(400).json({ message: 'Election is not currently open for voting' });
     }
 
+    // 5. Check if user has already voted in this election
     if (election.voters.includes(req.user.userId)) {
       return res.status(400).json({ message: 'You have already voted in this election' });
     }
 
+    // 6. Get the candidateId from request body (which user voted for)
     const candidateId = req.body.candidateId;
+
+    // 7. Validate if the candidateId is part of this election's candidate list
     if (!election.candidates.includes(candidateId)) {
       return res.status(404).json({ message: 'Invalid candidate' });
     }
 
+    // 8. Start a database session for atomic transaction
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // Create encrypted vote record
+      // 9. Prepare vote data (to be encrypted)
       const voteData = {
-        electionTitle: election.title,
-        candidateId: candidateId,
-        timestamp: new Date()
+        electionTitle: election.title,     // For extra context in the encrypted record
+        candidateId: candidateId,          // The chosen candidate
+        timestamp: new Date()              // When the vote was cast
       };
 
+      // 10. Create a new vote record with encrypted data
       const voteRecord = new VoteRecord({
         voter: req.user.userId,
         electionId: election._id,
-        encryptedData: VoteRecord.encryptVote(voteData, req.user.userId)
+        encryptedData: VoteRecord.encryptVote(voteData, req.user.userId) // Use custom encryption logic
       });
 
+      // 11. Save the vote record to the database under this session
       await voteRecord.save({ session });
 
-      // Update election
-      election.voters.push(req.user.userId);
+      // 12. Increment total vote count of the election
       election.totalVotes += 1;
-      
+
+      // 13. Check if this candidate already has an entry in results
       const resultIndex = election.results.findIndex(
         r => r.candidate.toString() === candidateId
       );
-      
+
+      // 14. If not found, create a new result entry for the candidate
       if (resultIndex === -1) {
         election.results.push({ candidate: candidateId, votes: 1 });
       } else {
+        // 15. Else, increment the vote count for the candidate
         election.results[resultIndex].votes += 1;
       }
 
+      // 16. Save the updated election document (totalVotes + results)
       await election.save({ session });
 
-      // Update user's voting status
+      // 17. Mark the user as hasVoted = true (so they can't vote again)
       await User.findByIdAndUpdate(
         req.user.userId,
         { hasVoted: true },
         { session }
       );
 
+      // 18. Commit the transaction — all changes persist together
       await session.commitTransaction();
       session.endSession();
 
+      // 19. Send success response
       res.json({ message: 'Vote cast successfully' });
+
     } catch (error) {
+      // 20. If anything fails, roll back all changes
       await session.abortTransaction();
       session.endSession();
-      throw error;
+      throw error; // Let outer catch handle error
     }
+
   } catch (error) {
+    // 21. Catch and respond with any errors
     res.status(500).json({ message: error.message });
   }
 });
-
 // Get user's voting history (only accessible by the voter)
 router.get('/my-voting-history', auth, async (req, res) => {
   try {
