@@ -6,9 +6,7 @@ const auth = require('../middleware/auth');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-router.get("/test",(req,res)=>{
-  res.send("test elections.");
-})
+
 // Get all elections
 router.get('/', auth, async (req, res) => {
   try {
@@ -21,11 +19,36 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Get user's voting history (only accessible by the voter)
+router.get('/my-voting-history', auth, async (req, res) => {
+  try {
+    const voteRecords = await VoteRecord.find({ voter: req.user.userId })
+      .sort({ createdAt: -1 });
+
+    const decryptedHistory = voteRecords.map(record => {
+      try {
+        return record.decryptVote(req.user.userId);
+      } catch (error) {
+        return null;
+      }
+    }).filter(record => record !== null);
+
+    res.json(decryptedHistory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get single election
 router.get('/:id', auth, async (req, res) => {
   console.log("Single election controller.");
   try {
-    const election = await Election.findById(req.params.id)
+    const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid election ID' });
+  }
+    const election = await Election.findById(id)
       .populate('candidates', 'username candidateInfo');
     
     if (!election) {
@@ -273,25 +296,7 @@ router.post('/:id/vote', auth, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-// Get user's voting history (only accessible by the voter)
-router.get('/my-voting-history', auth, async (req, res) => {
-  try {
-    const voteRecords = await VoteRecord.find({ voter: req.user.userId })
-      .sort({ createdAt: -1 });
 
-    const decryptedHistory = voteRecords.map(record => {
-      try {
-        return record.decryptVote(req.user.userId);
-      } catch (error) {
-        return null;
-      }
-    }).filter(record => record !== null);
-
-    res.json(decryptedHistory);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 // End election and publish results (admin only)
 router.post('/:id/end', auth, async (req, res) => {
@@ -337,15 +342,38 @@ router.get('/:id/results', auth, async (req, res) => {
     const election = await Election.findById(req.params.id)
       .populate('candidates', 'username candidateInfo')
       .populate('results.candidate', 'username candidateInfo');
-    
+  
     if (!election) {
       return res.status(404).json({ message: 'Election not found' });
     }
-
+  
     if (!election.isResultPublished && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Results not yet published' });
     }
-
+  
+    const results = election.results.map(result => ({
+      candidate: {
+        username: result.candidate.username,
+        party: result.candidate.candidateInfo.party,
+        position: result.candidate.candidateInfo.position
+      },
+      votes: result.votes,
+      percentage: result.percentage
+    }));
+  
+    // 🔍 Find the winner
+    const winnerResult = election.results.reduce((max, current) => {
+      return current.votes > max.votes ? current : max;
+    }, election.results[0]);
+  
+    const winner = {
+      username: winnerResult.candidate.username,
+      party: winnerResult.candidate.candidateInfo.party,
+      position: winnerResult.candidate.candidateInfo.position,
+      votes: winnerResult.votes,
+      percentage: winnerResult.percentage
+    };
+  
     res.json({
       title: election.title,
       description: election.description,
@@ -354,19 +382,13 @@ router.get('/:id/results', auth, async (req, res) => {
       startDate: election.startDate,
       endDate: election.endDate,
       totalVotes: election.totalVotes,
-      results: election.results.map(result => ({
-        candidate: {
-          username: result.candidate.username,
-          party: result.candidate.candidateInfo.party,
-          position: result.candidate.candidateInfo.position
-        },
-        votes: result.votes,
-        percentage: result.percentage
-      }))
+      results,
+      winner // 🏆 Winner added here
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+  
 });
 
 module.exports = router;
